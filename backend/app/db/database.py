@@ -18,10 +18,7 @@ engine = create_async_engine(
 )
 
 # Добавляем connect_args
-engine = create_async_engine(
-    DATABASE_URL,
-    connect_args={"ssl": "require"}
-)
+
 
 if not DATABASE_URL:
     raise ValueError("Ошибка: DATABASE_URL не задан в переменных окружения!")
