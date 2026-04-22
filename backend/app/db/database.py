@@ -1,13 +1,14 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-USER = "postgres" 
-PASSWORD = "Esen2010" 
-DB_NAME = "safepath"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASE_URL = f"postgresql+asyncpg://{USER}:{PASSWORD}@localhost:5432/{DB_NAME}"
+if not DATABASE_URL:
+    raise ValueError("Ошибка: DATABASE_URL не задан в переменных окружения!")
 # Создаем движок
 engine = create_async_engine(DATABASE_URL, echo=True)
 

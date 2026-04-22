@@ -1,8 +1,20 @@
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine
+from dotenv import load_dotenv
+import os
 
-# Скопируй сюда точно ту же строку, что у тебя в database.py
-DATABASE_URL = "postgresql+asyncpg://user:Esen2010@localhost:5432/safepath"
+load_dotenv()
+# Твой URL теперь БЕЗ "?sslmode=require"
+DATABASE_URL = os.getenv("DATABASE_URL") 
+
+# Добавляем connect_args
+engine = create_async_engine(
+    DATABASE_URL,
+    connect_args={"ssl": "require"}
+)
+
+if not DATABASE_URL:
+    raise ValueError("Ошибка: DATABASE_URL не задан в переменных окружения!")
 
 async def check_connection():
     try:
