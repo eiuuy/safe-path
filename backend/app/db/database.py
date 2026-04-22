@@ -7,6 +7,16 @@ load_dotenv()
 # Твой URL теперь БЕЗ "?sslmode=require"
 DATABASE_URL = os.getenv("DATABASE_URL") 
 
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=True,
+    # ВАЖНО: Эти параметры чинят твою ошибку
+    pool_pre_ping=True,      # Проверять соединение перед использованием
+    pool_recycle=3600,       # Пересоздавать соединения каждый час
+    pool_size=5,             # Максимум соединений в пуле
+    max_overflow=10          # Разрешить временный рост пула
+)
+
 # Добавляем connect_args
 engine = create_async_engine(
     DATABASE_URL,
