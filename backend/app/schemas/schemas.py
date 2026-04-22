@@ -31,6 +31,10 @@ class UserBase(BaseModel):
     role: UserRole
     # УДАЛИ СТРОКУ С relationship ОТСЮДА!
 
+class UserLogin(BaseModel): # НОВАЯ СХЕМА ДЛЯ ЛОГИНА
+    email: EmailStr
+    password: str
+
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=72) 
     
@@ -64,3 +68,4 @@ class SafetyPointRead(SafetyPointBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str

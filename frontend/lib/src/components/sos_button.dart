@@ -1,40 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/services.dart';
 
 class SosButton extends StatelessWidget {
-  const SosButton({super.key});
+  final VoidCallback onPressed; // Обязательный параметр
 
-  Future<void> _makeCall(BuildContext context) async {
-    // 1. Спрашиваем разрешение
-    var status = await Permission.phone.request();
-
-    if (status.isGranted) {
-      final Uri launchUri = Uri(scheme: 'tel', path: '102');
-      if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri);
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Ошибка звонка')));
-        }
-      }
-    } else {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Нет разрешения на звонок!')),
-        );
-      }
-    }
-  }
+  const SosButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      backgroundColor: Colors.red,
-      onPressed: () => _makeCall(context),
-      child: const Text("SOS", style: TextStyle(fontWeight: FontWeight.bold)),
+    return GestureDetector(
+      onLongPress: onPressed,
+      child: Container(
+        width: 80,
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.redAccent,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(color: Colors.red.withOpacity(0.4), blurRadius: 20),
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            "SOS",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

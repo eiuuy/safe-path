@@ -28,14 +28,23 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     return new_user
 
 @router.post("/login", response_model=Token)
-async def login(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
+async def login(user_in: UserLogin, db: AsyncSession = Depends(get_db)):
     # Ищем пользователя
-    result = await db.execute(select(User).where(User.email == user_data.email))
+    result = await db.execute(select(User).where(User.email == user_in.email))
     user = result.scalars().first()
     
-    if not user or not verify_password(user_data.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Неверный email или пароль")
+    if not user or not verify_password(user_in.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Неверный email или пароль"
+        )
     
-    # Создаем токен
+    # Создаем токен (передаем role в payload)
     token = create_access_token({"sub": str(user.id), "role": user.role})
-    return {"access_token": token, "token_type": "bearer"}
+    
+    # Возвращаем токен и роль
+    return {
+        "access_token": token, 
+        "token_type": "bearer", 
+        "role": user.role
+    }

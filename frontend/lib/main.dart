@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'src/screens/map_screen.dart';
-import 'src/screens/login_screen.dart';
+import 'src/theme/app_theme.dart'; // Подключаем тему
+import 'src/screens/login_screen.dart'; // Подключаем экран логина
 
 void main() {
   runApp(const SafePathApp());
@@ -14,12 +14,9 @@ class SafePathApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'E.C.H.O. Mate',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
-      ),
-      // Стартуем с логина, чтобы защитить приложение
-      home: LoginScreen(),
+      // Теперь используем наш класс AppTheme
+      theme: AppTheme.lightTheme,
+      home: const LoginScreen(),
     );
   }
 }

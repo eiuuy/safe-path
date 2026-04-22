@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../api/api_service.dart';
-import 'map_screen.dart';
+import '../navigation/home_router.dart';
+import '../screens/register_screen.dart'; // Убедись, что файл register_screen.dart существует
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,52 +11,83 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _userController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  void _login() async {
+  void _handleLogin() async {
     setState(() => _isLoading = true);
     final success = await ApiService().login(
-      _userController.text,
-      _passController.text,
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
     );
     setState(() => _isLoading = false);
 
-    if (success) {
+    if (success && mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MapScreen()),
+        MaterialPageRoute(builder: (_) => const HomeRouter()),
       );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Ошибка входа")));
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Ошибка входа: проверьте данные")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _userController,
-              decoration: const InputDecoration(labelText: 'Логин'),
-            ),
-            TextField(
-              controller: _passController,
-              decoration: const InputDecoration(labelText: 'Пароль'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(onPressed: _login, child: const Text("Войти")),
-          ],
+      appBar: AppBar(title: const Text("Вход")),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 15),
+              TextField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  labelText: "Пароль",
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 20),
+
+              // Кнопка Войти
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleLogin,
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text("Войти"),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // Кнопка Регистрация
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                  );
+                },
+                child: const Text("Нет аккаунта? Зарегистрироваться"),
+              ),
+            ],
+          ),
         ),
       ),
     );

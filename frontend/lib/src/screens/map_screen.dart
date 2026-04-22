@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../api/api_service.dart'; // Убедись, что путь правильный
+import '../api/api_service.dart';
 import '../components/sos_button.dart';
 import '../components/safe_info_card.dart';
 
@@ -15,7 +15,6 @@ class _MapScreenState extends State<MapScreen> {
   final LatLng _center = const LatLng(53.2858, 69.4128);
   final ApiService _api = ApiService();
 
-  // Состояния для хранения данных с бэкенда
   List _circles = [];
   String _statusText = "E.C.H.O. Mate: Загрузка...";
 
@@ -25,10 +24,10 @@ class _MapScreenState extends State<MapScreen> {
     _loadData();
   }
 
-  // Метод для получения данных при запуске
   Future<void> _loadData() async {
     try {
-      var data = await _api.getCircles();
+      var data = await _api
+          .getCircles(); // Убедись, что этот метод есть в ApiService
       if (mounted) {
         setState(() {
           _circles = data;
@@ -53,7 +52,7 @@ class _MapScreenState extends State<MapScreen> {
             myLocationButtonEnabled: false,
           ),
 
-          // Инфо-карточка (теперь она будет менять текст при загрузке данных)
+          // Передаем параметр status
           Positioned(
             top: 60,
             left: 20,
@@ -61,10 +60,17 @@ class _MapScreenState extends State<MapScreen> {
             child: SafeInfoCard(status: _statusText),
           ),
 
-          // Кнопка SOS
-          const Positioned(bottom: 40, right: 30, child: SosButton()),
+          // Передаем параметр onPressed
+          Positioned(
+            bottom: 40,
+            right: 30,
+            child: SosButton(
+              onPressed: () {
+                print("SOS Нажата");
+              },
+            ),
+          ),
 
-          // Дополнительно: Кнопка для ручного обновления (если нужно)
           Positioned(
             top: 60,
             right: 20,

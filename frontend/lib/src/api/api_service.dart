@@ -7,29 +7,31 @@ class ApiService {
 
   Future<Map<String, String>> _headers() async {
     final prefs = await SharedPreferences.getInstance();
-    final token =
-        prefs.getString('auth_token') ?? ''; // Добавил безопасное получение
+    final token = prefs.getString('auth_token') ?? '';
     return {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
   }
 
-  // 1. АВТОРИЗАЦИЯ
+  // 1. АВТОРИЗАЦИЯ (теперь без роли)
   Future<bool> login(String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "email": email,
-          "role": "teenager",
-          "password": password,
-        }),
+        body: jsonEncode({"email": email, "password": password}),
       );
+
       if (response.statusCode == 200) {
-        final token = jsonDecode(response.body)['access_token'];
-        (await SharedPreferences.getInstance()).setString('auth_token', token);
+        final data = jsonDecode(response.body);
+        final prefs = await SharedPreferences.getInstance();
+
+        // Сохраняем токен и роль (если сервер её возвращает)
+        await prefs.setString('auth_token', data['access_token']);
+        if (data.containsKey('role')) {
+          await prefs.setString('user_role', data['role']);
+        }
         return true;
       }
       return false;
@@ -39,7 +41,7 @@ class ApiService {
     }
   }
 
-  // 2. РЕГИСТРАЦИЯ
+  // 2. РЕГИСТРАЦИЯ (с выбором роли)
   Future<bool> register(String email, String role, String password) async {
     try {
       final response = await http.post(
@@ -54,7 +56,7 @@ class ApiService {
     }
   }
 
-  // 3. КРУГИ (CIRCLES)
+  // Остальные методы (Круги, Позиции, Места) остаются без изменений
   Future<List<dynamic>> getCircles() async {
     try {
       final response = await http.get(
@@ -63,7 +65,6 @@ class ApiService {
       );
       return response.statusCode == 200 ? jsonDecode(response.body) : [];
     } catch (e) {
-      print("Ошибка получения кругов: $e");
       return [];
     }
   }
@@ -77,12 +78,10 @@ class ApiService {
       );
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      print("Ошибка создания круга: $e");
       return false;
     }
   }
 
-  // 4. ПОЗИЦИИ
   Future<bool> updatePosition(double lat, double lon) async {
     try {
       final response = await http.post(
@@ -92,12 +91,10 @@ class ApiService {
       );
       return response.statusCode == 200;
     } catch (e) {
-      print("Ошибка обновления позиции: $e");
       return false;
     }
   }
 
-  // 5. БЕЗОПАСНЫЕ МЕСТА
   Future<dynamic> getNearestSafeSpace(double lat, double lon) async {
     try {
       final url = '$baseUrl/safe-spaces/safe-spaces/nearest?lat=$lat&lon=$lon';
@@ -107,7 +104,6 @@ class ApiService {
       );
       return response.statusCode == 200 ? jsonDecode(response.body) : null;
     } catch (e) {
-      print("Ошибка получения мест: $e");
       return null;
     }
   }
