@@ -17,13 +17,20 @@ class ApiService {
   // 1. АВТОРИЗАЦИЯ (теперь без роли)
   Future<bool> login(String email, String password) async {
     try {
+      // ДОБАВЬТЕ "/auth" ПЕРЕД "/login"
+      final url = Uri.parse('$baseUrl/auth/login');
+
+      // ДОБАВЬТЕ ЭТОТ ПРИНТ ДЛЯ ОТЛАДКИ
+      print('DEBUG: Попытка входа по адресу: $url');
+
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
+        url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"email": email, "password": password}),
       );
 
       if (response.statusCode == 200) {
+        // ... ваш код дальше
         final data = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
 
@@ -45,7 +52,7 @@ class ApiService {
   Future<bool> register(String email, String role, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
+        Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"email": email, "role": role, "password": password}),
       );

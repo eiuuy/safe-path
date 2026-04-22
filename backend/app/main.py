@@ -8,16 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 # 2. ЗАТЕМ СОЗДАНИЕ ПРИЛОЖЕНИЯ
 app = FastAPI()
 
-# 3. ПОСЛЕ СОЗДАНИЯ ПРИЛОЖЕНИЯ ДОБАВЛЯЕМ MIDDLEWARE (CORS)
-# Это «ворота» твоего приложения. Ставим их здесь, чтобы запрос проверялся до того, как дойдет до маршрутов.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r"https://.*\.lovableproject\.com|https://.*\.lovable\.app|http://localhost:\d+",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Эта функция запускается ОДИН РАЗ при старте сервера
 @asynccontextmanager
 async def lifespan(app: FastAPI):
