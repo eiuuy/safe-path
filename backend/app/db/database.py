@@ -1,17 +1,24 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
-
+from dotenv import load_dotenv
 load_dotenv()
 
 # Твой URL теперь БЕЗ "?sslmode=require"
 DATABASE_URL = os.getenv("DATABASE_URL") 
 
-# Добавляем connect_args
 engine = create_async_engine(
     DATABASE_URL,
-    connect_args={"ssl": "require"}
+    echo=True,
+    # ВАЖНО: Эти параметры чинят твою ошибку
+    pool_pre_ping=True,      # Проверять соединение перед использованием
+    pool_recycle=3600,       # Пересоздавать соединения каждый час
+    pool_size=5,             # Максимум соединений в пуле
+    max_overflow=10          # Разрешить временный рост пула
 )
+
+# Добавляем connect_args
+
 
 if not DATABASE_URL:
     raise ValueError("Ошибка: DATABASE_URL не задан в переменных окружения!")
