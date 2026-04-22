@@ -4,12 +4,6 @@ from sqlalchemy.exc import OperationalError
 
 # ПОМЕНЯЙ ЭТИ ДАННЫЕ:
 # Если пароль не помнишь, это тот, что вводил при установке Postgres
-USER = "postgres" 
-PASSWORD = "Esen2010" 
-DB_NAME = "safepath"
-
-DATABASE_URL = f"postgresql+asyncpg://{USER}:{PASSWORD}@localhost:5432/{DB_NAME}"
-
 async def check():
     engine = create_async_engine(DATABASE_URL)
     try:
